@@ -4,12 +4,13 @@ import React from "react";
 import { StyleSheet } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
-import { Container, List, ListItem, Content, Text } from "native-base";
-import { Video } from "react-native-video";
+import { Container, List, ListItem, Content, Text, Button } from "native-base";
+import Video, { FilterType } from "react-native-video";
+// import { useNavigation } from "@react-navigation/core";
 
 export default function App() {
   const Stack = createStackNavigator();
-  const navigation = useNavigation();
+  // const navigation = useNavigation();
   function VideoListScreen({ navigation }) {
     return (
       <Container>
@@ -18,7 +19,7 @@ export default function App() {
             <ListItem
               onPress={() =>
                 navigation.navigate("Video Player", {
-                  ecternal: true,
+                  external: true,
                   videoURL: "https://www.w3schools.com/html/mov_bbb.mp4",
                 })
               }
@@ -28,7 +29,7 @@ export default function App() {
             <ListItem
               onPress={() =>
                 navigation.navigate("Video Player", {
-                  ecternal: false,
+                  external: false,
                   videoURL: require("./assets/reactfilter.mp4"),
                 })
               }
@@ -40,12 +41,48 @@ export default function App() {
       </Container>
     );
   }
-  function VideoPlayerScreen({ route }) {
+  function VideoPlayerScreen({ navigation, route }) {
+    const { external, videoURL } = route.params;
+    const [filter, setFilter] = React.useState(FilterType.NONE);
+
+    const changeFilter = (filter) => {
+      setFilter(filter);
+    };
     return (
       <Container>
         <Video
-          source={{ uri: "background" }} // Can be a URL or a local file.
+          controls={true}
+          paused={true}
+          muted={true}
+          filterEnabled={true}
+          filter={filter}
+          source={external ? { uri: videoURL } : videoURL} // Can be a URL or a local file.
+          style={{ flex: 1 }}
         />
+        <Button
+          block
+          onPress={() => {
+            changeFilter(FilterType.MONOCHROME);
+          }}
+        >
+          <Text>Filter to chrome</Text>
+        </Button>
+        <Button
+          block
+          onPress={() => {
+            changeFilter(FilterType.MONO);
+          }}
+        >
+          <Text>Filter to mono</Text>
+        </Button>
+        <Button
+          block
+          onPress={() => {
+            changeFilter(FilterType.FADE);
+          }}
+        >
+          <Text>Filter to fade</Text>
+        </Button>
       </Container>
     );
   }
